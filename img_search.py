@@ -26,7 +26,7 @@ def image_scrape(links):
         filename = link.split('/')[-1].split('.')[0]
         ext = '.' + link.split('.')[-1]
 
-        try:    # Try to Download Image
+        try:    # Try to Download Image and print if error
             img = urllib2.urlopen(link)
         except urllib2.URLError, err:   # TODO Why are some links "Bad Request"
             print err.read() + link
@@ -37,8 +37,8 @@ def image_scrape(links):
             print "Saved: " + filename
 
 
-def main():
-    url = raw_input("Image URL: ")  # TODO add valid url check
+def main():							# TODO allow local picture file input
+    url = raw_input("Image URL: ")  # TODO add valid picture url check
     links = image_lookup(url)   # search for similar
     image_scrape(links)         # save results
 
