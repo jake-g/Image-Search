@@ -1,10 +1,10 @@
 import urllib2
 from cookielib import CookieJar
+import os
 import re
 import time
+import easygui
 
-
-start = time.time()     # Debug Timer
 
 cookies = CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
@@ -20,28 +20,51 @@ def image_lookup(path):
     return links
 
 
-def image_scrape(links):
+def image_scrape(links, path):
     for link in links:
         # print link    # Debug
         filename = link.split('/')[-1].split('.')[0]
         ext = '.' + link.split('.')[-1]
 
-        try:    # Try to Download Image and print if error
-            img = urllib2.urlopen(link)
-        except urllib2.URLError, err:   # TODO Why are some links "Bad Request"
-            print err.read() + link
+        print "Link : " + link
 
         # Save Image
-        with open(filename + ext, 'wb') as local_file:
-            local_file.write(img.read())
-            print "Saved: " + filename
+        try:    # Try to Download Image and print if error
+            img = urllib2.urlopen(link)
+            filepath = os.path.join(path, filename + ext)
+            print filepath
+            with open(filepath, 'wb') as local_file:
+                local_file.write(img.read())
+                print "Saved: " + filename
+
+        except urllib2.URLError, err:   # TODO Why are some links "Bad Request"
+            # print err.read()
+            print err.reason
+            print "Error"
+
+
+
+
+
+def valid_url(url):		# check valid url
+    regex = re.compile(
+        r'^https?://'  # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return url is not None and regex.search(url)
 
 
 def main():							# TODO allow local picture file input
-    url = raw_input("Image URL: ")  # TODO add valid picture url check
+    url = easygui.enterbox(msg='Image URL: ', title='Input URL', default='', strip=True)
+    path = easygui.diropenbox(msg='Image Save Path : ', title="Save Path", default='')
+    if not valid_url(url):
+        print "Error: Not valid URL"
+    start = time.time()
     links = image_lookup(url)   # search for similar
-    image_scrape(links)         # save results
-
+    image_scrape(links, path)         # save results
     end = time.time()   # Debug runtime
     print "Search Time: " + str(end - start) + ' seconds'
 
