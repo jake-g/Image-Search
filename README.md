@@ -1,5 +1,7 @@
 # Image-Search
 
+## GOOGLE CHANGED STUFF... NO LONGER WORKING
+
 Simple script to locally store the top response from Google reverse image search
 
 ### Usage
